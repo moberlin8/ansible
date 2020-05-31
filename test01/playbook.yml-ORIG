@@ -1,0 +1,19 @@
+---
+- hosts: all
+  become: yes
+
+  roles:
+  - role: gantsign.antigen_bundles
+    users:
+      - username: vagrant
+        antigen_libraries:
+          - name: oh-my-zsh
+            env:
+              DISABLE_AUTO_UPDATE: '"true"' # Optional (this was hard-coded in the .zshrc of the `gantsign.oh-my-zsh` role)
+        antigen_theme:
+          name: powerlevel10k/powerlevel10k # This role has no default theme (unlike the `gantsign.oh-my-zsh` role)
+        antigen_bundles:
+          - name: git # This role has no default bundles/plugins (unlike the `gantsign.oh-my-zsh` role)
+          - name: romkatv/powerlevel10k # no clue if this is correct
+            url: https://github.com/romkatv/powerlevel10k # Optional. If the it's not one of the Oh-My-Zsh plugins you must specify the URL (use owner/repo shorthand for GitHub)
+

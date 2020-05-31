@@ -1,0 +1,39 @@
+---
+- hosts: all
+  become: yes
+  vars:
+   username: vagrant
+
+  roles:
+    - role: gantsign.antigen
+      users:
+        - username: '{{ username }}'
+          antigen_libraries:
+            - name: oh-my-zsh
+          antigen_theme:
+            name: powerlevel10k 
+          antigen_bundles:
+            - name: command-not-found
+            - name: docker
+            - name: git
+    - role: gantsign.antigen_bundles
+      become: no
+      users:
+        - username: '{{ username }}' 
+          antigen_bundles:
+            # Bundle from the default repo (robbyrussell's oh-my-zsh)
+            - name: command-not-found
+            # Syntax highlighting bundle
+            - name: zsh-syntax-highlighting # `name` is required (any valid file name will do so long as it's unique for the bundles)
+              url: zsh-users/zsh-syntax-highlighting
+            - name: powerlevel10k
+              url: romkatv/powerlevel10k
+
+
+  tasks:
+  - git:
+      repo: 'https://github.com/romkatv/powerlevel10k.git'
+      dest: '/home/{{ username }}/.powerlevel10k'
+      depth: 1
+      clone: yes
+
