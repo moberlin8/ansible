@@ -1,0 +1,66 @@
+---
+- hosts: all
+  become: yes
+  vars:
+   username: vagrant
+
+  roles:
+    - role: gantsign.antigen
+      users:
+        - username: '{{ username }}'
+          antigen_libraries:
+            - name: oh-my-zsh
+          antigen_theme:
+            name: powerlevel10k 
+          antigen_bundles:
+            - name: command-not-found
+            - name: docker
+            - name: git
+    - role: gantsign.antigen_bundles
+      become: no
+      users:
+        - username: '{{ username }}' 
+          antigen_bundles:
+            # Bundle from the default repo (robbyrussell's oh-my-zsh)
+            - name: command-not-found
+            # Syntax highlighting bundle
+            - name: zsh-syntax-highlighting # `name` is required (any valid file name will do so long as it's unique for the bundles)
+              url: zsh-users/zsh-syntax-highlighting
+            - name: powerlevel10k
+              url: romkatv/powerlevel10k
+
+  tasks:
+  ##- name: Creates directory
+  ##  file:
+  ##    path: '/home/{{ username }}/.antigen/bin/internal/'
+  ##    state: directory
+
+    ##  - name: copy the powerlevel10k script to the expected directory
+    ##copy:
+    ##  remote_src: true
+    ##  src: '.antigen/bundles/romkatv/powerlevel10k/internal/p10k.zsh'
+    ##  dest: '/home/{{ username }}/.antigen/bin/internal/p10k.zsh'
+    ##  owner: '{{ username }}'
+    ##  group: '{{ username }}'
+    ##  mode: '0776'
+      ###delegate_to: localhost
+
+  - git:
+      repo: 'https://github.com/romkatv/powerlevel10k.git'
+      dest: '/home/{{ username }}/.antigen/bin/'
+      depth: 1
+      clone: yes
+  ##- name: Edit zsh start to use powerlevel10k
+  ##    lineinfile:
+  ##      path: '/home/{{ username }}/.zshrc'
+  ##      line: 'source ~/.powerlevel10k/powerlevel10k.zsh-theme'
+  ##- name: get file stat to be able to perform a check in the following task
+  ##  local_action: i'stat path=.antigen/bundles/romkatv/powerlevel10k/internal/p10k.zsh'
+  ##  register: p10k
+
+  ##- name: copy file if it exists
+  ##  copy: 
+  ##    src: '.antigen/bundles/romkatv/powerlevel10k/internal/p10k.zsh'
+  ##    dest: '/home/{{ username }}/'
+  ##    when: p10k.stat.exists
+

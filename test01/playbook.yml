@@ -4,36 +4,38 @@
   vars:
    username: vagrant
 
-  roles:
-    - role: gantsign.antigen
-      users:
-        - username: '{{ username }}'
-          antigen_libraries:
-            - name: oh-my-zsh
-          antigen_theme:
-            name: powerlevel10k 
-          antigen_bundles:
-            - name: command-not-found
-            - name: docker
-            - name: git
-    - role: gantsign.antigen_bundles
-      become: no
-      users:
-        - username: '{{ username }}' 
-          antigen_bundles:
-            # Bundle from the default repo (robbyrussell's oh-my-zsh)
-            - name: command-not-found
-            # Syntax highlighting bundle
-            - name: zsh-syntax-highlighting # `name` is required (any valid file name will do so long as it's unique for the bundles)
-              url: zsh-users/zsh-syntax-highlighting
-            - name: powerlevel10k
-              url: romkatv/powerlevel10k
-
-
   tasks:
-  - git:
-      repo: 'https://github.com/romkatv/powerlevel10k.git'
-      dest: '/home/{{ username }}/.powerlevel10k'
-      depth: 1
-      clone: yes
+  - name: Install zsh cause it's the bestest and some other stuff
+    apt:
+      pkg:
+        - zsh
+        - git
 
+  - name: Do a curl thing to install antigen
+    get_url:
+      url: 'https://git.io/antigen' 
+      dest: '/home/{{ username }}/antigen.zsh'
+      mode: '0766'
+      owner: '{{ username }}'
+      group: '{{ username }}'
+
+  - name: Ansible create file if it doesn't exist example
+    file:
+      path: '/home/{{ username }}/.zshrc'
+      state: touch
+      owner: '{{ username }}'
+      group: '{{ username }}'
+      
+  - name: Edit zsh start to use powerlevel10k
+    copy:
+      dest: '/home/{{ username }}/.zshrc'
+      content: |
+        source /home/{{ username }}/antigen.zsh
+        antigen use oh-my-zsh
+        antigen theme romkatv/powerlevel10k
+        antigen apply
+
+  - name: We really should use zsh since we are setting it up
+    user:
+      name: '{{ username }}'
+      shell: /bin/zsh
